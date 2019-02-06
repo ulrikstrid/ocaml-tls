@@ -9,20 +9,14 @@ maintainer:   ["Hannes Mehnert <hannes@mehnert.org>" "David Kaloper <david@numm.
 license:      "BSD2"
 
 build: [
-  [ "ocaml" "pkg/pkg.ml" "build" "--pinned" "%{pinned}%" "--tests" "false"
-    "--with-lwt" "%{lwt+ptime:installed}%"
-    "--with-mirage" "%{mirage-flow-lwt+mirage-kv-lwt+mirage-clock+ptime:installed}%" ]
-  ["ocaml" "pkg/pkg.ml" "build" "--pinned" "%{pinned}%" "--tests" "true"
-    "--with-lwt" "%{lwt+ptime+astring:installed}%"
-    "--with-mirage" "%{mirage-flow-lwt+mirage-kv-lwt+mirage-clock+ptime:installed}%" ] {with-test}
-  ["ocaml" "pkg/pkg.ml" "test"] {with-test}
+  ["dune" "subst"] {pinned}
+  ["dune" "build" "-p" name "-j" jobs]
+  ["dune" "runtest" "-p" name "-j" jobs] {with-test}
 ]
 
 depends: [
   "ocaml" {>= "4.02.2"}
-  "ocamlfind" {build}
-  "ocamlbuild" {build}
-  "topkg" {build}
+  "dune" {build}
   "ppx_sexp_conv"
   "ppx_deriving"
   "ppx_cstruct" {>= "3.0.0"}
@@ -33,9 +27,7 @@ depends: [
   "x509" {>= "0.6.1"}
   "cstruct-unix" {with-test & >= "3.0.0"}
   "ounit" {with-test}
-]
-depopts: [
-  "lwt"
+  "lwt" {>="2.4.8"}
   "mirage-flow-lwt"
   "mirage-kv-lwt"
   "mirage-clock"
@@ -43,7 +35,6 @@ depopts: [
   "astring" {with-test}
 ]
 conflicts: [
-  "lwt" {<"2.4.8"}
   "mirage-net-xen" {<"1.3.0"}
   "mirage-types" {<"3.0.0"}
   "sexplib" {= "v0.9.0"}
